@@ -42,7 +42,7 @@ jobs:
           GH_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN }}
         run: |
           sudo apt install gh -y
-          # gh repo create ${{ inputs.project_name }} --public --description "ML project for ${{ inputs.project_name }} "
+          gh repo create ${{ inputs.project_name }} --public --description "ML project for ${{ inputs.project_name }} "
 
   initialize-repo:
     runs-on: ubuntu-latest
