@@ -74,7 +74,8 @@ jobs:
             "input_schema_name": "${{ inputs.model_schema }}",
             "input_unity_catalog_read_user_group": "${{ vars.DATABRICKS_UNITY_CATALOG_READ_USER_GROUP }}",
             "input_inference_table_name": "${{ inputs.inference_table }}",
-            "input_include_feature_store": "${{ inputs.include_feature_store }}"
+            "input_include_feature_store": "${{ inputs.include_feature_store }}",
+            "input_include_mlflow_recipes": "no"
           }' > config.json
           cat config.json
           # databricks bundle init mlops-stacks --config-file config.json
