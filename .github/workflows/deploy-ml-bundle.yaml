@@ -8,6 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       project-name:
+        description: ML use case name
         type: string
         required: true
 
@@ -17,16 +18,30 @@ env:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
 
-  create-repo:
+  deploy-bundle:
+
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Create repository
-        env:
-          GH_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Check out source code
+        uses: actions/checkout@v4
+
+      - name: Setup Python version
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
         run: |
-          sudo apt install gh -y
-          echo "CODE is ${{ inputs.project-name }}"
-          gh repo create ${{ inputs.project-name }} --public --description "ML project for ${{ inputs.project-name }} "
+          sudo apt update
+          sudo apt install curl unzip -y
+          python -m pip install --upgrade pip
+          curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+
+      - name: Verify installations
+        run: |
+          databricks --version
+          databricks bundle init --help
