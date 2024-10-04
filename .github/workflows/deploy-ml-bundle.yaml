@@ -14,11 +14,11 @@ on:
       model_schema:
         description: Schema where models will be stored
         type: string
-        required: true
+        default: "meerlanden_schema"
       inference_table:
         description: Table where the inferences will be stored
         type: string
-        required: true
+        default: "meerlanden_inference_table"
       include_feature_store:
         type: choice
         description: Whether to include Feature Store
