@@ -7,41 +7,76 @@ on:
 
   workflow_dispatch:
     inputs:
-      project-name:
+      project_name:
         description: ML use case name
         type: string
         required: true
-
+      model_schema:
+        description: Schema where models will be stored
+        type: string
+        required: true
+      inference_table:
+        description: ML use case name
+        type: string
+        required: true
+      include_feature_store:
+        type: choice
+        description: Whether to include Feature Store
+        options:
+          - "no"
+          - "yes"
+        default: "no"
+        required: true
 env:
   PYTHON_VERSION: '3.10'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
 
-  deploy-bundle:
-
-    # The type of runner that the job will run on
+  create-repo:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Check out source code
-        uses: actions/checkout@v4
-
-      - name: Setup Python version
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Install dependencies
+      - name: Create repository
+        env:
+          GH_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN }}
         run: |
-          sudo apt update
-          sudo apt install curl unzip -y
-          python -m pip install --upgrade pip
-          curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+          sudo apt install gh -y
+          gh repo create ${{ inputs.project_name }} --public --description "ML project for ${{ inputs.project_name }} "
 
-      - name: Verify installations
+  initialize-repo:
+    runs-on: ubuntu-latest
+    needs: create-repo
+    steps:
+      - name: Setup Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Initialize bundle
+        env:
+          DATABRICKS_HOST: ${{ vars.DATABRICKS_STAGING_WORKSPACE_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
-          databricks --version
-          databricks bundle init --help
+          echo '{
+            "input_setup_cicd_and_project": "CICD_and_Project",
+            "input_project_name": "${{ inputs.project_name }}",
+            "input_cloud": "${{ vars.DATABRICKS_CLOUD }}",
+            "input_cicd_platform": "${{ vars.DATABRICKS_CICD_PLATFORM }}",
+            "input_databricks_staging_workspace_host": "${{ vars.DATABRICKS_STAGING_WORKSPACE_HOST }}",
+            "input_databricks_prod_workspace_host": "${{ vars.DATABRICKS_PROD_WORKSPACE_HOST }}",
+            "input_default_branch": "main",
+            "input_release_branch": "release",
+            "input_read_user_group": "${{ vars.DATABRICKS_READ_USER_GROUP }}",
+            "input_include_models_in_unity_catalog": "yes",
+            "input_staging_catalog_name": "${{ vars.DATABRICKS_STAGING_CATALOG_NAME }}",
+            "input_prod_catalog_name": "${{ vars.DATABRICKS_PROD_CATALOG_NAME }}",
+            "input_test_catalog_name": "${{ vars.DATABRICKS_TEST_CATALOG_NAME }}",
+            "input_schema_name": "${{ inputs.model_schema }}",
+            "input_unity_catalog_read_user_group": "${{ vars.DATABRICKS_UNITY_CATALOG_READ_USER_GROUP }}",
+            "input_inference_table_name": "${{ inputs.inference_table }}",
+            "input_include_feature_store": "${{ inputs.include_feature_store }}"
+          }' > config.json
+          cat config.json
+          # databricks bundle init mlops-stacks --config-file config.json
+          # read this https://docs.databricks.com/en/dev-tools/bundles/mlops-stacks.html
+          # also check this https://github.com/databricks/mlops-stacks
+          # and also this https://gist.github.com/DaniJG/b21170482545ad8c93874d164fd97a90 and this
+          # https://github.com/databricks/mlops-stacks/blob/main/tests/example-project-configs/azure/azure-github.json
