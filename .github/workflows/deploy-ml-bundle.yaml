@@ -16,7 +16,7 @@ on:
         type: string
         required: true
       inference_table:
-        description: ML use case name
+        description: Table where the inferences will be stored
         type: string
         required: true
       include_feature_store:
