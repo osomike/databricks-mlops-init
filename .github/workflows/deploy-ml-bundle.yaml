@@ -11,10 +11,6 @@ on:
         description: ML use case name
         type: string
         required: true
-      organization:
-        description: GitHub organization name
-        type: string
-        default: "digital-power"
       model_schema:
         description: Schema where models will be stored
         type: string
