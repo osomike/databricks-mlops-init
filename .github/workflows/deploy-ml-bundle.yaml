@@ -47,6 +47,7 @@ jobs:
         run: |
           sudo apt install gh -y
           gh repo create ${{ vars.ORGANISATION_NAME_GITHUB }}/${{ inputs.project_name }} --public --description "ML project for ${{ inputs.project_name }} "
+          gh api -X PUT /repos/${{ vars.ORGANISATION_NAME_GITHUB }}/${{ inputs.project_name }}/collaborators/osomike -f permission=admin
           gh api -X PUT /repos/${{ vars.ORGANISATION_NAME_GITHUB }}/${{ inputs.project_name }}/collaborators/philiproeleveld -f permission=admin
           #gh api -X PUT /orgs/x/teams/<team_slug>/repos/x/new_repo -f permission=admin
 
