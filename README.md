@@ -77,6 +77,52 @@ If Azure is the cloud provider, the workflow modifies the service principal cred
 
 Finally, the workflow pushes the initialized project to the newly created repository on GitHub.
 
+---
+
+## Organizational Prerequisites for ML Project initialization deployment
+
+Before deploying this workflow in your organization, ensure that the following requirements are met to enable seamless creation and management 
+
+### 1. Multiple Workspaces
+   - The organization must have **at least two Databricks workspaces**:
+     - **Development/Staging Workspace**: Used for development and testing of ML models.
+     - **Production Workspace**: Used for deploying models in production environments.
+   - Both workspaces should be properly configured with Unity Catalog, user groups, and service principals.
+
+### 2. Unity Catalog Enabled Workspaces
+   - Each Databricks workspace where this workflow will be used **must have Unity Catalog enabled**.
+   - Unity Catalog is essential for managing data governance, sharing, and access controls across the ML projects.
+
+### 3. Catalogs and Schemas in Workspaces
+   - The required **catalogs and schemas must be deployed in each workspace**:
+     - Catalogs should already exist to store and manage ML models.
+     - Schemas should be available for storing ML inferences, which will be specified in the workflow (`inference_table`).
+   - Ensure the following catalog names are set up:
+     - Staging Catalog
+     - Production Catalog
+     - Test Catalog (if applicable)
+
+### 4. User Groups for ML Bundles
+   - The organization should have **Databricks or Entra ID (Azure Active Directory) user groups** created to manage permissions for ML bundles.
+     - Example groups:
+       - `databricks-read-user-group`: Grants read access to specified users for the created ML bundles.
+       - `databricks-unity-catalog-read-user-group`: Manages access to Unity Catalog for specific projects.
+   - Ensure proper assignment of user groups for security and role-based access.
+
+### 5. Service Principal and Tokens in Workspaces
+   - Each Databricks workspace must have an associated **service principal** to handle the automated operations of the ML projects.
+     - Create a service principal in your Azure environment and configure **OAuth 2.0 tokens** for authentication between Databricks and external systems (like GitHub).
+     - This service principal will handle operations such as deploying bundles, pushing configurations, and managing jobs.
+
+### 6. GitHub Token with Adequate Permissions
+   - A **GitHub Personal Access Token (PAT)** with the necessary permissions is required to automate repository creation and configure secrets/variables:
+     - Permissions needed:
+       - **Repository creation**: To create new private repositories for each ML use case.
+       - **Manage secrets**: To configure environment variables and secrets in the repository for secure authentication (e.g., Databricks workspace credentials).
+       - **Assign roles**: To assign collaborators with admin, write, or read permissions to the newly created repository.
+     - The token should be stored as `ADMIN_GITHUB_TOKEN` in the GitHub Secrets.
+
+
 ## How to Use
 
 1. Trigger the workflow manually via the `Actions` tab in the repository.
