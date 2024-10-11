@@ -116,10 +116,13 @@ Before deploying this workflow in your organization, ensure that the following r
 ### 6. GitHub Token with Adequate Permissions
    - A **GitHub Personal Access Token (PAT)** with the necessary permissions on the organization githuab space is required to automate repository creation and configure secrets/variables:
      - Permissions needed:
-       - **Repository creation**: To create new private repositories for each ML use case.
-       - **Manage secrets**: To configure environment variables and secrets in the repository for secure authentication (e.g., Databricks workspace credentials).
-       - **Assign roles**: To assign collaborators with admin, write, or read permissions to the newly created repository.
-     - The token should be stored as `ADMIN_GITHUB_TOKEN` in the GitHub Secrets.
+       - **Administration**: To create new private repositories for each ML use case and assign collaborators with
+       admin, write, or read permissions to the newly created repository.
+       - **Commit statuses**: To add commits to the new repositories.
+       - **Contents**: To access repository contents, commits, branches, downloads, releases, and merges.
+       - **Environments**: To manage repository environments.
+       - **Secrets**: To to configure environment variables and secrets in the repository for secure authentication (e.g., Databricks workspace credentials).
+       - **Workflows**: To update GitHub Action workflow files from the newly created repositories.
 
 
 ## How to Use
