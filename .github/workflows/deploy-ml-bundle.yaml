@@ -1,5 +1,3 @@
-# This is a basic workflow to help you get started with Actions
-
 name: deploy-ml-bundle
 
 # Controls when the workflow will run
@@ -42,10 +40,16 @@ jobs:
           GH_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN }}
         run: |
           sudo apt install gh -y
-          gh repo create ${{ vars.ORGANISATION_NAME_GITHUB }}/${{ inputs.project_name }} --public --description "ML project for ${{ inputs.project_name }} "
-          gh api -X PUT /repos/${{ vars.ORGANISATION_NAME_GITHUB }}/${{ inputs.project_name }}/collaborators/osomike -f permission=admin
-          gh api -X PUT /repos/${{ vars.ORGANISATION_NAME_GITHUB }}/${{ inputs.project_name }}/collaborators/philiproeleveld -f permission=admin
+          gh repo create ${{ github.repository_owner }}/${{ inputs.project_name }} --private --description "ML project for ${{ inputs.project_name }} "
+          gh api -X PUT /repos/${{ github.repository_owner }}/${{ inputs.project_name }}/collaborators/osomike -f permission=admin
+          gh api -X PUT /repos/${{ github.repository_owner }}/${{ inputs.project_name }}/collaborators/philiproeleveld -f permission=admin
           #gh api -X PUT /orgs/x/teams/<team_slug>/repos/x/new_repo -f permission=admin
+          gh secret set STAGING_DATABRICKS_HOST -b "${{ vars.DATABRICKS_STAGING_WORKSPACE_HOST }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
+          gh secret set STAGING_DATABRICKS_CLIENT_ID -b "${{ vars.DATABRICKS_STAGING_CLIENT_ID }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
+          gh secret set STAGING_DATABRICKS_CLIENT_SECRET -b "${{ secrets.DATABRICKS_STAGING_CLIENT_SECRET }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
+          gh secret set PROD_DATABRICKS_HOST -b "${{ vars.DATABRICKS_PROD_WORKSPACE_HOST }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
+          gh secret set PROD_DATABRICKS_CLIENT_ID -b "${{ vars.DATABRICKS_PROD_CLIENT_ID }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
+          gh secret set PROD_DATABRICKS_CLIENT_SECRET -b "${{ secrets.DATABRICKS_PROD_CLIENT_SECRET }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
 
   initialize-repo:
     runs-on: ubuntu-latest
@@ -77,12 +81,43 @@ jobs:
             "input_schema_name": "${{ inputs.model_schema }}",
             "input_unity_catalog_read_user_group": "${{ vars.DATABRICKS_UNITY_CATALOG_READ_USER_GROUP }}",
             "input_inference_table_name": "${{ inputs.inference_table }}",
-            "input_include_feature_store": "${{ inputs.include_feature_store }}",
-            "input_include_mlflow_recipes": "no"
+            "input_include_feature_store": "${{ inputs.include_feature_store }}"
           }' > config.json
-          cat config.json
-          # databricks bundle init mlops-stacks --config-file config.json
-          # read this https://docs.databricks.com/en/dev-tools/bundles/mlops-stacks.html
+          databricks bundle init mlops-stacks --config-file config.json
+          # read this https://docs.databricks.com/en/dev-tools/bundles/settings.html#bundle-syntax-mappings
           # also check this https://github.com/databricks/mlops-stacks
           # and also this https://gist.github.com/DaniJG/b21170482545ad8c93874d164fd97a90 and this
           # https://github.com/databricks/mlops-stacks/blob/main/tests/example-project-configs/azure/azure-github.json
+
+      - name: Initialize local repository
+        run: |
+          cd ${{ inputs.project_name }}
+          git init -b main
+          git config user.email "noreply@digital-power.com"
+          git config user.name "${{ github.actor }}"
+          git add .
+          git commit -m "Initialize the repository"
+
+      - name: Modify service principal source
+        run: |
+          cd ${{ inputs.project_name }}
+          # See https://docs.databricks.com/en/dev-tools/auth/oauth-m2m.html#finish-configuring-oauth-m2m-authentication
+          if [ "${{ vars.DATABRICKS_CLOUD }}" = "azure" ]; then
+            git ls-files | xargs -n 1 sed -i "
+              s/ARM_TENANT_ID\|AZURE_SP_TENANT_ID/DATABRICKS_HOST/g
+              s/ARM_CLIENT_ID\|AZURE_SP_APPLICATION_ID/DATABRICKS_CLIENT_ID/g
+              s/ARM_CLIENT_SECRET\|AZURE_SP_CLIENT_SECRET/DATABRICKS_CLIENT_SECRET/g
+            "
+            sed -i "13d" .github/workflows/deploy-cicd.yml
+          else
+            exit 1
+          fi
+          git commit -a -m "Modify service principal source"
+
+      - name: Push to remote
+        env:
+          GH_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+        run: |
+          cd ${{ inputs.project_name }}
+          git remote add origin "https://$GH_TOKEN@github.com/${{ github.repository_owner }}/${{ inputs.project_name }}.git"
+          git push -u origin main
