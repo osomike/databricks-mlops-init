@@ -87,7 +87,6 @@ Before deploying this workflow in your organization, ensure that the following r
    - The organization must have **at least two Databricks workspaces**:
      - **Development/Staging Workspace**: Used for development and testing of ML models.
      - **Production Workspace**: Used for deploying models in production environments.
-   - Both workspaces should be properly configured with Unity Catalog, user groups, and service principals.
 
 ### 2. Unity Catalog Enabled Workspaces
    - Each Databricks workspace where this workflow will be used **must have Unity Catalog enabled**.
@@ -115,7 +114,7 @@ Before deploying this workflow in your organization, ensure that the following r
      - This service principal will handle operations such as deploying bundles, pushing configurations, and managing jobs.
 
 ### 6. GitHub Token with Adequate Permissions
-   - A **GitHub Personal Access Token (PAT)** with the necessary permissions is required to automate repository creation and configure secrets/variables:
+   - A **GitHub Personal Access Token (PAT)** with the necessary permissions on the organization githuab space is required to automate repository creation and configure secrets/variables:
      - Permissions needed:
        - **Repository creation**: To create new private repositories for each ML use case.
        - **Manage secrets**: To configure environment variables and secrets in the repository for secure authentication (e.g., Databricks workspace credentials).
