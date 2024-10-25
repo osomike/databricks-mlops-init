@@ -52,12 +52,9 @@ jobs:
           sudo apt install gh -y
           echo "Creating repository ${{ github.repository_owner }}/${{ inputs.project_name }}..."
           gh repo create ${{ github.repository_owner }}/${{ inputs.project_name }} --private --description "ML project for ${{ inputs.project_name }} "
-          #gh api -X PUT /repos/${{ github.repository_owner }}/${{ inputs.project_name }}/collaborators/osomike -f permission=admin
-          #gh api -X PUT /repos/${{ github.repository_owner }}/${{ inputs.project_name }}/collaborators/philiproeleveld -f permission=admin
           echo "Granting accesses to the repository ${{ github.repository_owner }}/${{ inputs.project_name }}..."
           gh api -X PUT /orgs/${{ github.repository_owner }}/teams/${{ inputs.github_admins_group }}/repos/${{ github.repository_owner }}/${{ inputs.project_name }} -f permission=admin
           gh api -X PUT /orgs/${{ github.repository_owner }}/teams/${{ inputs.github_contributor_group }}/repos/${{ github.repository_owner }}/${{ inputs.project_name }} -f permission=push
-          #gh api -X PUT /orgs/x/teams/<team_slug>/repos/x/new_repo -f permission=admin
           echo "Setting secrets on repository ${{ github.repository_owner }}/${{ inputs.project_name }}..."
           gh secret set STAGING_DATABRICKS_HOST -b "${{ vars.DATABRICKS_STAGING_WORKSPACE_HOST }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
           gh secret set STAGING_DATABRICKS_CLIENT_ID -b "${{ vars.DATABRICKS_STAGING_CLIENT_ID }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
@@ -106,6 +103,7 @@ jobs:
 
       - name: Initialize local repository
         run: |
+          cp -r custom_notebooks/discovery ./${{ inputs.project_name }}/${{ inputs.project_name }}/discovery
           cd ${{ inputs.project_name }}
           git init -b main
           git config user.email "noreply@digital-power.com"
