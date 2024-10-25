@@ -114,8 +114,8 @@ Before deploying this workflow in your organization, ensure that the following r
      - This service principal will handle operations such as deploying bundles, pushing configurations, and managing jobs.
 
 ### 6. GitHub Token with Adequate Permissions
-   - A **GitHub Personal Access Token (PAT)** with the necessary permissions on the organization githuab space is required to automate repository creation and configure secrets/variables:
-     - Permissions needed:
+   - A **GitHub Personal Access Token (PAT)** with the necessary permissions on the organization github space is required to automate the repository creation and configure access and secrets/variables:
+     - Repository permissions needed:
        - **Administration**: To create new private repositories for each ML use case and assign collaborators with
        admin, write, or read permissions to the newly created repository.
        - **Commit statuses**: To add commits to the new repositories.
@@ -124,6 +124,8 @@ Before deploying this workflow in your organization, ensure that the following r
        - **Secrets**: To to configure environment variables and secrets in the repository for secure authentication (e.g., Databricks workspace credentials).
        - **Workflows**: To update GitHub Action workflow files from the newly created repositories.
 
+     - Organization permissions needed:
+       - **Members**: To be able to read the groups defined inside the organizations. To then be able to grant access to the newly created use-case repository to these groups.
 
 ## How to Use
 
