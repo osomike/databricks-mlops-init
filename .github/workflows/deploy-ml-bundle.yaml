@@ -103,6 +103,7 @@ jobs:
 
       - name: Initialize local repository
         run: |
+          ls
           cp -r custom_notebooks/discovery ./${{ inputs.project_name }}/${{ inputs.project_name }}/discovery
           cd ${{ inputs.project_name }}
           git init -b main
