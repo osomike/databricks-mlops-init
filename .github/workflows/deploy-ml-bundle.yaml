@@ -9,6 +9,16 @@ on:
         description: ML use case name
         type: string
         required: true
+      github_contributor_group:
+        description: Contributors group in GitHub to grant contributor access to the new use-case repository
+        type: string
+        required: true
+        default: "dip_ml_contributors"
+      github_admins_group:
+        description: Admins group in GitHub to grant admin access to the new use-case repository
+        type: string
+        required: true
+        default: "dip_ml_admins"
       model_schema:
         description: Schema where models will be stored
         type: string
@@ -43,6 +53,9 @@ jobs:
           gh repo create ${{ github.repository_owner }}/${{ inputs.project_name }} --private --description "ML project for ${{ inputs.project_name }} "
           gh api -X PUT /repos/${{ github.repository_owner }}/${{ inputs.project_name }}/collaborators/osomike -f permission=admin
           gh api -X PUT /repos/${{ github.repository_owner }}/${{ inputs.project_name }}/collaborators/philiproeleveld -f permission=admin
+          gh api -X PUT /orgs/${{ github.repository_owner }}/teams/${{ inputs.github_admins_group }}/repos/${{ github.repository_owner }}/${{ inputs.project_name }} -f permission=admin
+          gh api -X PUT /orgs/${{ github.repository_owner }}/teams/${{ inputs.github_contributor_group }}/repos/${{ github.repository_owner }}/${{ inputs.project_name }} -f permission=push
+          gh api -X PUT /orgs/${{ github.repository_owner }}/teams/${{ inputs.github_contributor_group }}/repos/${{ github.repository_owner }}/${{ inputs.project_name }} -f permission=pull
           #gh api -X PUT /orgs/x/teams/<team_slug>/repos/x/new_repo -f permission=admin
           gh secret set STAGING_DATABRICKS_HOST -b "${{ vars.DATABRICKS_STAGING_WORKSPACE_HOST }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
           gh secret set STAGING_DATABRICKS_CLIENT_ID -b "${{ vars.DATABRICKS_STAGING_CLIENT_ID }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
