@@ -71,6 +71,11 @@ jobs:
       - name: Setup Databricks CLI
         uses: databricks/setup-cli@main
 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .
+
       - name: Initialize bundle
         env:
           DATABRICKS_HOST: ${{ vars.DATABRICKS_STAGING_WORKSPACE_HOST }}
