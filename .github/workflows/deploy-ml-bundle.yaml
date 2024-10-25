@@ -74,10 +74,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Check root repo
-        run: |
-          ls
-          pwd
       - name: Initialize bundle
         env:
           DATABRICKS_HOST: ${{ vars.DATABRICKS_STAGING_WORKSPACE_HOST }}
@@ -110,8 +106,9 @@ jobs:
 
       - name: Initialize local repository
         run: |
-          ls
+          echo "Copying data discovery notebook into the templated solution folder..."
           cp -r custom_notebooks/discovery ./${{ inputs.project_name }}/${{ inputs.project_name }}/discovery
+          echo "Commiting all the templated solution folder into the repository ${{ github.repository_owner }}/${{ inputs.project_name }}..."
           cd ${{ inputs.project_name }}
           git init -b main
           git config user.email "noreply@digital-power.com"
