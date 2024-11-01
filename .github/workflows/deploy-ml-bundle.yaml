@@ -135,7 +135,7 @@ jobs:
           git commit -a -m "Run clusters in single-user mode"
 
       - name: Modify service principal source
-        if: ${{ vars.MODIFY_SP_SOURCE != '' }}
+        if: ${{ vars.USE_DATABRICKS_SERVICE_PRINCIPAL != '' }}
         run: |
           cd ${{ inputs.project_name }}
           # See https://docs.databricks.com/en/dev-tools/auth/oauth-m2m.html#finish-configuring-oauth-m2m-authentication
