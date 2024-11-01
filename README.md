@@ -1,6 +1,6 @@
 # Databricks ML Use-Case Initialization Workflow, by Digital Power
 
-This repository contains a GitHub Actions workflow that automates the setup of a new ML project for Databricks, complete with CI/CD and MLOps best practices. The workflow creates a new repository for the specified ML use case, configures necessary secrets, and initializes the Databricks bundle for the project. The goal is to standardize and simplify the process of starting new ML projects within the organization.
+This repository contains a GitHub Actions workflow that automates the setup of a new ML project for Databricks, completed with CI/CD and MLOps best practices. The workflow creates a new repository for the specified ML use case, configures necessary secrets, and initializes the Databricks bundle for the project. The goal is to standardize and simplify the process of starting new ML projects within the organization.
 
 ## Features
 
@@ -19,8 +19,10 @@ The workflow can be triggered manually via the `workflow_dispatch` event. When t
 ### Inputs
 
 - **`project_name`** (required): The name of the new ML use case. This name will also be used to create the GitHub repository.
-- **`model_schema`** (optional): The schema where models will be stored. Default is `"meerlanden_schema"`.
-- **`inference_table`** (optional): The name of the table where inferences will be stored. Default is `"meerlanden_inference_table"`.
+- **`github_contributor_group`** (required): The name of the GitHub team group with contributor rights. This group will be granted access to contribute to the newly created repository.
+- **`github_admins_group`** (required): The name of the GitHub team group with administrator rights. This group will be granted access to administrate the newly created repository.
+- **`model_schema`** (optional): The schema where models will be stored. Default is `"all_my_ml_models"`.
+- **`inference_table`** (optional): The name of the table where inferences will be stored. Default is under the format `catalog.schema.table_name`.
 - **`include_feature_store`** (optional): Whether to include a Databricks Feature Store in the project. Options: `"yes"` or `"no"`. Default is `"no"`.
 
 ### Secrets

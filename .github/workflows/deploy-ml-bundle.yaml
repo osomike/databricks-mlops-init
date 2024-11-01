@@ -22,9 +22,9 @@ on:
       model_schema:
         description: Schema where models will be stored
         type: string
-        default: "dip_ml_usecase_01"
+        default: "all_my_ml_models"
       inference_table:
-        description: Table where the inferences will be stored
+        description: Table where the inferences will be stored under `catalog.schema.table_name` format 
         type: string
         default: "dip_ml_dev.dip_ml_usecase_01.predictions_usecase_01"
       include_feature_store:
