@@ -121,7 +121,7 @@ jobs:
         run: |
           cd ${{ inputs.project_name }}
           # See:
-          # https://docs.databricks.com/en/compute/access-mode-limitations.html
+          # https://docs.databricks.com/en/compute/access-mode-limitations.html#shared-access-mode-limitations-on-unity-catalog
           # https://docs.databricks.com/en/dev-tools/bundles/variables.html#custom-variables
           # https://docs.databricks.com/api/azure/workspace/jobs/create#job_clusters-new_cluster-data_security_mode
           sed -i "
