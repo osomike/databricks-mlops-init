@@ -116,7 +116,26 @@ jobs:
           git add .
           git commit -m "Initialize the repository"
 
+      - name: Run clusters in single-user mode
+        run: |
+          cd ${{ inputs.project_name }}
+          # See:
+          # https://docs.databricks.com/en/compute/access-mode-limitations.html
+          # https://docs.databricks.com/en/dev-tools/bundles/variables.html#custom-variables
+          # https://docs.databricks.com/api/azure/workspace/jobs/create#job_clusters-new_cluster-data_security_mode
+          sed -i "
+            s/\(variables:.*\)/\1\n  sp_client_id:\n    description: Client ID (or Application ID) of the service principal./
+            s/\( *\)\(${{ vars.DATABRICKS_STAGING_CATALOG_NAME }}:.*\)/\1\2\n\1  variables:\n\1    sp_client_id: ${{ vars.DATABRICKS_STAGING_CLIENT_ID }}/
+            s/\( *\)\(${{ vars.DATABRICKS_PROD_CATALOG_NAME }}:.*\)/\1\2\n\1  variables:\n\1    sp_client_id: ${{ vars.DATABRICKS_PROD_CLIENT_ID }}/
+            s/\( *\)\(${{ vars.DATABRICKS_TEST_CATALOG_NAME }}:.*\)/\1\2\n\1  variables:\n\1    sp_client_id: ${{ vars.DATABRICKS_STAGING_CLIENT_ID }}/
+          " ${{ inputs.project_name }}/databricks.yml
+          sed -i "
+            s/\( *\)\(new_cluster:\)\$/\1\2\n\1  data_security_mode: SINGLE_USER\n\1  single_user_name: \${var.sp_client_id}/
+          " ${{ inputs.project_name }}/resources/*.yml
+          git commit -a -m "Run clusters in single-user mode"
+
       - name: Modify service principal source
+        if: ${{ vars.MODIFY_SP_SOURCE != '' }}
         run: |
           cd ${{ inputs.project_name }}
           # See https://docs.databricks.com/en/dev-tools/auth/oauth-m2m.html#finish-configuring-oauth-m2m-authentication
