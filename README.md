@@ -127,7 +127,7 @@ Before deploying this workflow in your organization, ensure that the following r
        - **Workflows**: To update GitHub Action workflow files from the newly created repositories.
 
      - Organization permissions needed:
-       - **Members**: To be able to read the groups defined inside the organizations. To then be able to grant access to the newly created use-case repository to these groups.
+       - **Members**: `Read-Only` to be able to read the groups defined inside the organizations. To then be able to grant access to the newly created use-case repository to these groups.
 
 ## How to Use
 
