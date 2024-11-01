@@ -98,7 +98,8 @@ jobs:
             "input_inference_table_name": "${{ inputs.inference_table }}",
             "input_include_feature_store": "${{ inputs.include_feature_store }}"
           }' > config.json
-          databricks bundle init mlops-stacks --config-file config.json
+          databricks bundle init mlops-stacks --tag v0.4 --config-file config.json
+          # bundle version (tag) is pinned based on https://github.com/databricks/mlops-stacks/tags
           # read this https://docs.databricks.com/en/dev-tools/bundles/settings.html#bundle-syntax-mappings
           # also check this https://github.com/databricks/mlops-stacks
           # and also this https://gist.github.com/DaniJG/b21170482545ad8c93874d164fd97a90 and this
