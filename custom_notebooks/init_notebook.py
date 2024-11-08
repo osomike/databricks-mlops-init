@@ -21,21 +21,20 @@ for env in ['dev', 'stg', 'prd']:
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Create Schemas and prediction tables in the catalogs
-# MAGIC Create the schemas and predictions tables for all the environments
+# MAGIC ## Create Schemas in the catalogs
+# MAGIC Create the schemas all the environments
 
 # COMMAND ----------
 
 for env in ['dev', 'stg', 'prd']:
     print(f'Running commands for {env}...')
     spark.sql(f'CREATE SCHEMA IF NOT EXISTS {company_prefix}_ml_{env}.ml_usecase_test')
-    spark.sql(f'CREATE TABLE IF NOT EXISTS {company_prefix}_ml_{env}.ml_usecase_test.predictions_usecase_test (prediction INT)')
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Create Schemas and prediction tables in the catalogs
-# MAGIC Create the schemas and predictions tables for all the environments
+# MAGIC ## Create dummy input table
+# MAGIC Create a dummy table to be able to run the default example from the bundle
 
 # COMMAND ----------
 
