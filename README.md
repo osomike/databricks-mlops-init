@@ -48,32 +48,33 @@ The following environment variables must be set at the organization or repositor
 - **`DATABRICKS_STAGING_CATALOG_NAME`**: The catalog name for the staging environment.
 - **`DATABRICKS_PROD_CATALOG_NAME`**: The catalog name for the production environment.
 - **`DATABRICKS_TEST_CATALOG_NAME`**: The catalog name for the testing environment.
+- **`USE_DATABRICKS_SERVICE_PRINCIPAL`**: Feature flag. If provided, use Databricks service principals instead of (default) cloud provider service principals.
 
 ## Workflow Steps
 
 ### 1. Repository Creation
 
-The workflow starts by creating a new private GitHub repository with the name provided as `project_name`. It also grants admin access to specified collaborators and sets up the necessary secrets for Databricks integration.
+The workflow starts by creating a new private GitHub repository with the name provided as `project_name`. It also grants access to specified admins and  collaborators and sets up the necessary secrets for Databricks integration.
 
-### 2. Databricks CLI Setup
+### 2. Databricks Bundle Initialization
 
-The workflow installs and configures the Databricks CLI to interact with your Databricks workspaces. The staging environment is used by default for initial setup.
-
-### 3. Databricks Bundle Initialization
-
-Using the `databricks bundle init` command, the workflow initializes a new MLops stack based on the provided configuration (`config.json`). This configuration includes details such as:
+Using the `databricks bundle init` command, the workflow initializes a new MLops stack based on the provided configuration (`config.json`). This configuration includes details from inputs, secrets, and environment variables, such as:
 
 - Workspace URLs (staging and production)
 - Catalog and schema names
 - Branch settings for CI/CD
 
-### 4. Git Initialization and Setup
+### 3. Git Initialization and Setup
 
-After initializing the Databricks bundle, the workflow sets up a local Git repository, adds the project files, commits them, and pushes the new repository to GitHub.
+After initializing the Databricks bundle, the workflow sets up a local Git repository, adds the project files, and commits them.
 
-### 5. Service Principal Modifications (Azure-specific)
+### 4. Modification of the Bundle After Initialization
 
-If Azure is the cloud provider, the workflow modifies the service principal credentials in the project files to match Databricks requirements.
+The workflow modifies the project files to run job clusters in single-user access mode for the service principal. This is necessary because [it is not yet supported by the bundle](https://github.com/databricks/mlops-stacks/issues/140), and [Databricks runtime ML is not supported in shared mode](https://docs.databricks.com/en/compute/access-mode-limitations.html#shared-access-mode-limitations-on-unity-catalog). To avoid having to fork the MLOps Stacks repository, this is implemented with [sed](https://www.gnu.org/software/sed/manual/html_node/The-_0022s_0022-Command.html#The-_0022s_0022-Command) and added as a separate commit.
+
+### 5. (Optional) Service Principal Modifications
+
+By default, the project uses service principals from the cloud provider. If the enviroment variable `USE_DATABRICKS_SERVICE_PRINCIPAL` is specified, the workflow modifies the project files to use [Databricks service principals](https://docs.databricks.com/en/dev-tools/auth/oauth-m2m.html#finish-configuring-oauth-m2m-authentication). This is only supported when `DATABRICKS_CLOUD` is `"azure"`. To avoid having to fork the MLOps Stacks repository, this is implemented with [sed](https://www.gnu.org/software/sed/manual/html_node/The-_0022s_0022-Command.html#The-_0022s_0022-Command) and added as a separate commit.
 
 ### 6. Push to Remote Repository
 
@@ -101,7 +102,7 @@ Before deploying this workflow in your organization, ensure that the following r
    - Ensure the following catalog names are set up:
      - Staging Catalog
      - Production Catalog
-     - Test Catalog (if applicable)
+     - Test Catalog
 
 ### 4. User Groups for ML Bundles
    - The organization should have **Databricks or Entra ID (Azure Active Directory) user groups** created to manage permissions for ML bundles.
@@ -123,7 +124,7 @@ Before deploying this workflow in your organization, ensure that the following r
        - **Commit statuses**: To add commits to the new repositories.
        - **Contents**: To access repository contents, commits, branches, downloads, releases, and merges.
        - **Environments**: To manage repository environments.
-       - **Secrets**: To to configure environment variables and secrets in the repository for secure authentication (e.g., Databricks workspace credentials).
+       - **Secrets**: To configure environment variables and secrets in the repository for secure authentication (e.g., Databricks workspace credentials).
        - **Workflows**: To update GitHub Action workflow files from the newly created repositories.
 
      - Organization permissions needed:

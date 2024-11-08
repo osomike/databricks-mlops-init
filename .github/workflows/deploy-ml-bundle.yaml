@@ -56,12 +56,23 @@ jobs:
           gh api -X PUT /orgs/${{ github.repository_owner }}/teams/${{ inputs.github_admins_group }}/repos/${{ github.repository_owner }}/${{ inputs.project_name }} -f permission=admin
           gh api -X PUT /orgs/${{ github.repository_owner }}/teams/${{ inputs.github_contributor_group }}/repos/${{ github.repository_owner }}/${{ inputs.project_name }} -f permission=push
           echo "Setting secrets on repository ${{ github.repository_owner }}/${{ inputs.project_name }}..."
-          gh secret set STAGING_DATABRICKS_HOST -b "${{ vars.DATABRICKS_STAGING_WORKSPACE_HOST }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
-          gh secret set STAGING_DATABRICKS_CLIENT_ID -b "${{ vars.DATABRICKS_STAGING_CLIENT_ID }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
-          gh secret set STAGING_DATABRICKS_CLIENT_SECRET -b "${{ secrets.DATABRICKS_STAGING_CLIENT_SECRET }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
-          gh secret set PROD_DATABRICKS_HOST -b "${{ vars.DATABRICKS_PROD_WORKSPACE_HOST }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
-          gh secret set PROD_DATABRICKS_CLIENT_ID -b "${{ vars.DATABRICKS_PROD_CLIENT_ID }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
-          gh secret set PROD_DATABRICKS_CLIENT_SECRET -b "${{ secrets.DATABRICKS_PROD_CLIENT_SECRET }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
+          if [ "${{ vars.USE_DATABRICKS_SERVICE_PRINCIPAL }}" != "" ]; then
+            gh secret set STAGING_DATABRICKS_HOST -b "${{ vars.DATABRICKS_STAGING_WORKSPACE_HOST }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
+            gh secret set STAGING_DATABRICKS_CLIENT_ID -b "${{ vars.DATABRICKS_STAGING_CLIENT_ID }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
+            gh secret set STAGING_DATABRICKS_CLIENT_SECRET -b "${{ secrets.DATABRICKS_STAGING_CLIENT_SECRET }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
+            gh secret set PROD_DATABRICKS_HOST -b "${{ vars.DATABRICKS_PROD_WORKSPACE_HOST }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
+            gh secret set PROD_DATABRICKS_CLIENT_ID -b "${{ vars.DATABRICKS_PROD_CLIENT_ID }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
+            gh secret set PROD_DATABRICKS_CLIENT_SECRET -b "${{ secrets.DATABRICKS_PROD_CLIENT_SECRET }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
+          elif [ "${{ vars.DATABRICKS_CLOUD }}" = "azure" ]; then
+            gh secret set STAGING_AZURE_SP_TENANT_ID -b "${{ vars.DATABRICKS_STAGING_TENANT_ID }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
+            gh secret set STAGING_AZURE_SP_APPLICATION_ID -b "${{ vars.DATABRICKS_STAGING_CLIENT_ID }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
+            gh secret set STAGING_AZURE_SP_CLIENT_SECRET -b "${{ secrets.DATABRICKS_STAGING_CLIENT_SECRET }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
+            gh secret set PROD_AZURE_SP_TENANT_ID -b "${{ vars.DATABRICKS_PROD_TENANT_ID }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
+            gh secret set PROD_AZURE_SP_APPLICATION_ID -b "${{ vars.DATABRICKS_PROD_CLIENT_ID }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
+            gh secret set PROD_AZURE_SP_CLIENT_SECRET -b "${{ secrets.DATABRICKS_PROD_CLIENT_SECRET }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
+          else
+            exit 1
+          fi
 
   initialize-repo:
     runs-on: ubuntu-latest
@@ -121,7 +132,7 @@ jobs:
         run: |
           cd ${{ inputs.project_name }}
           # See:
-          # https://docs.databricks.com/en/compute/access-mode-limitations.html
+          # https://docs.databricks.com/en/compute/access-mode-limitations.html#shared-access-mode-limitations-on-unity-catalog
           # https://docs.databricks.com/en/dev-tools/bundles/variables.html#custom-variables
           # https://docs.databricks.com/api/azure/workspace/jobs/create#job_clusters-new_cluster-data_security_mode
           sed -i "
