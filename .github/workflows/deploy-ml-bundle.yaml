@@ -22,19 +22,16 @@ on:
       model_schema:
         description: Schema where models will be stored
         type: string
+        required: true
         default: "all_my_ml_models"
-      inference_table:
-        description: Table where the inferences will be stored under `catalog.schema.table_name` format 
-        type: string
-        default: "dip_ml_dev.dip_ml_usecase_01.predictions_usecase_01"
       include_feature_store:
-        type: choice
         description: Whether to include Feature Store
+        type: choice
         options:
           - "no"
           - "yes"
-        default: "no"
         required: true
+        default: "no"
 env:
   PYTHON_VERSION: '3.10'
 
@@ -106,7 +103,7 @@ jobs:
             "input_test_catalog_name": "${{ vars.DATABRICKS_TEST_CATALOG_NAME }}",
             "input_schema_name": "${{ inputs.model_schema }}",
             "input_unity_catalog_read_user_group": "${{ vars.DATABRICKS_UNITY_CATALOG_READ_USER_GROUP }}",
-            "input_inference_table_name": "${{ inputs.inference_table }}",
+            "input_inference_table_name": "${{ vars.DATABRICKS_TEST_CATALOG_NAME }}.${{ inputs.model_schema }}.predictions",
             "input_include_feature_store": "${{ inputs.include_feature_store }}"
           }' > config.json
           databricks bundle init mlops-stacks --tag v0.4 --config-file config.json
