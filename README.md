@@ -141,14 +141,16 @@ Before deploying this workflow in your organization, ensure that the following r
    - Initialize a Databricks MLops project.
    - Set up required secrets and configurations.
    - Push the initial project files to the new repository.
+4. If you would like to run the default workflows make sure to valide the parameters passed to the different steps. This configuration is on `/<project_name>/resources/*.yml` files. You should at least update the `input_table_name` for the inference batch job, check file `/<project_name>/resources/batch-inference-workflow-resource.yml`
 
 ## Example
 
 To create a new ML project named `awesome-ml-project` with a custom model schema and inference table, trigger the workflow with the following inputs:
 
 - `project_name`: `awesome-ml-project`
+- `github_contributor_group`: `github_ml_contributors`
+- `github_admins_group`: `github_ml_admins`
 - `model_schema`: `custom_schema`
-- `inference_table`: `custom_inference_table`
 - `include_feature_store`: `yes`
 
 The workflow will then initialize the project with these configurations and set up the repository in GitHub.
