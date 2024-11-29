@@ -29,8 +29,8 @@ The workflow can be triggered manually via the `workflow_dispatch` event. When t
 The workflow requires the following GitHub Secrets:
 
 - **`ADMIN_GITHUB_TOKEN`**: A GitHub token with admin access to the repositories, required for creating new repositories and setting secrets.
-- **`DATABRICKS_STAGING_CLIENT_SECRET`**: The client secret for authenticating with the staging databricks workspace.
-- **`DATABRICKS_PROD_CLIENT_SECRET`**: The client secret for authenticating with the production databricks workspace.
+- **`DATABRICKS_STAGING_CLIENT_SECRET`**: The service principal client secret for authenticating with the staging databricks workspace.
+- **`DATABRICKS_PROD_CLIENT_SECRET`**: The service principal client secret for authenticating with the production databricks workspace.
 - **`DATABRICKS_TOKEN`**: Used to initialize the databricks mlops bundle, can be any authentication token for any workspace.
 
 ### Environment Variables
@@ -39,20 +39,18 @@ The following environment variables must be set at the organization or repositor
 
 - **`DATABRICKS_CICD_PLATFORM`**: The platform used for CI/CD (e.g., `github_actions`).
 - **`DATABRICKS_CLOUD`**: The cloud provider hosting Databricks (e.g., `azure`).
-- **`DATABRICKS_PROD_CATALOG_NAME`**: The catalog name for the production environment.
-- **`DATABRICKS_PROD_CLIENT_ID`**: The client ID for authenticating with the Databricks production environment.
-- **`DATABRICKS_PROD_TENANT_ID`**: The tenant ID for authenticating with the Databricks production environment.
-- **`DATABRICKS_PROD_WORKSPACE_HOST`**: The Databricks workspace host URL for the production environment.
+- **`DATABRICKS_PROD_CATALOG_NAME`**: The catalog name for the production environment. Note.- Keep in mind that this name will also be used in the bundle as the production target name, and associate it to the prd workspace and the prd service principal. Once the repository is initalized check the file `/<project_name>/databricks.yml`
+- **`DATABRICKS_PROD_CLIENT_ID`**: The service principal client ID for authenticating with the Databricks production environment.
+- **`DATABRICKS_PROD_TENANT_ID`**: The tenant ID where the service principal is registered, for authenticating with the Databricks production environment. Only needed if Azure service principals are used. Check variable `USE_DATABRICKS_SERVICE_PRINCIPAL`
+- **`DATABRICKS_PROD_WORKSPACE_HOST`**: The Databricks workspace host URL for the production environment. (e.g., `https://adb-xxx.azuredatabricks.net`)
 - **`DATABRICKS_READ_USER_GROUP`**: The user group inside databricks that should have read access to the databricks workflows for the ml project.
-- **`DATABRICKS_STAGING_CATALOG_NAME`**: The catalog name for the staging environment.
-- **`DATABRICKS_STAGING_CLIENT_ID`**: The client ID for authenticating with the Databricks staging environment.
-- **`DATABRICKS_STAGING_TENANT_ID`**: The tenant ID for authenticating with the Databricks staging environment.
-- **`DATABRICKS_STAGING_WORKSPACE_HOST`**: The Databricks workspace host URL for the staging environment.
-
+- **`DATABRICKS_STAGING_CATALOG_NAME`**: The catalog name for the staging environment. Note.- Keep in mind that this name will also be used in the bundle as the staging target name, and associate it to the staging workspace and the staging service principal. Once the repository is initalized check the file `/<project_name>/databricks.yml`
+- **`DATABRICKS_STAGING_CLIENT_ID`**: The service principal client ID for authenticating with the Databricks staging environment.
+- **`DATABRICKS_STAGING_TENANT_ID`**: The tenant ID where the service principal is registered, for authenticating with the Databricks staging environment. Only needed if Azure service principals are used. Check variable `USE_DATABRICKS_SERVICE_PRINCIPAL`
+- **`DATABRICKS_STAGING_WORKSPACE_HOST`**: The Databricks workspace host URL for the staging environment. (e.g., `https://adb-xxx.azuredatabricks.net`)
+- **`DATABRICKS_TEST_CATALOG_NAME`**: The catalog name for the test environment. Note.- Keep in mind that this name will also be used in the bundle as the test target name, and associate it to the staging workspace and the staging service principal. Once the repository is initalized check the file `/<project_name>/databricks.yml`
 - **`DATABRICKS_UNITY_CATALOG_READ_USER_GROUP`**: The Unity Catalog read user group.
-
-
-- **`USE_DATABRICKS_SERVICE_PRINCIPAL`**: Feature flag. If different from `''` (empty string), use Databricks service principals instead of cloud provider service principals.
+- **`USE_DATABRICKS_SERVICE_PRINCIPAL`**: Feature flag. If `true`, use Databricks service principals instead of cloud provider service principals.
 
 ## Workflow Steps
 
