@@ -141,7 +141,7 @@ Before deploying this workflow in your organization, ensure that the following r
    - Initialize a Databricks MLops project.
    - Set up required secrets and configurations.
    - Push the initial project files to the new repository.
-4. If you would like to run the default workflows make sure to valide the parameters passed to the different steps. This configuration is on `/<project_name>/resources/*.yml` files. You should at least update the `input_table_name` for the inference batch job, check file `/<project_name>/resources/batch-inference-workflow-resource.yml`
+4. If you would like to run the default workflows make sure to validate the parameters passed to the different steps. This configuration is on `/<project_name>/resources/*.yml` files. You should at least update the `input_table_name` for the inference batch job, check file `/<project_name>/resources/batch-inference-workflow-resource.yml`
 
 ## Example
 
