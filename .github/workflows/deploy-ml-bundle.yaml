@@ -53,7 +53,7 @@ jobs:
           gh api -X PUT /orgs/${{ github.repository_owner }}/teams/${{ inputs.github_admins_group }}/repos/${{ github.repository_owner }}/${{ inputs.project_name }} -f permission=admin
           gh api -X PUT /orgs/${{ github.repository_owner }}/teams/${{ inputs.github_contributor_group }}/repos/${{ github.repository_owner }}/${{ inputs.project_name }} -f permission=push
           echo "Setting secrets on repository ${{ github.repository_owner }}/${{ inputs.project_name }}..."
-          if [ "${{ vars.USE_DATABRICKS_SERVICE_PRINCIPAL }}" != "" ]; then
+          if [ "${{ vars.USE_DATABRICKS_SERVICE_PRINCIPAL }}" == "true" ]; then
             gh secret set STAGING_DATABRICKS_HOST -b "${{ vars.DATABRICKS_STAGING_WORKSPACE_HOST }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
             gh secret set STAGING_DATABRICKS_CLIENT_ID -b "${{ vars.DATABRICKS_STAGING_CLIENT_ID }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
             gh secret set STAGING_DATABRICKS_CLIENT_SECRET -b "${{ secrets.DATABRICKS_STAGING_CLIENT_SECRET }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
@@ -144,7 +144,7 @@ jobs:
           git commit -a -m "Run clusters in single-user mode"
 
       - name: Modify service principal source
-        if: ${{ vars.USE_DATABRICKS_SERVICE_PRINCIPAL != '' }}
+        if: ${{ vars.USE_DATABRICKS_SERVICE_PRINCIPAL == 'true' }}
         run: |
           cd ${{ inputs.project_name }}
           # See https://docs.databricks.com/en/dev-tools/auth/oauth-m2m.html#finish-configuring-oauth-m2m-authentication
