@@ -22,33 +22,38 @@ The workflow can be triggered manually via the `workflow_dispatch` event. When t
 - **`github_contributor_group`** (required): The name of the GitHub team group with contributor rights. This group will be granted access to contribute to the newly created repository.
 - **`github_admins_group`** (required): The name of the GitHub team group with administrator rights. This group will be granted access to administrate the newly created repository.
 - **`model_schema`** (optional): The schema where models will be stored. This schema has to be present in staging and production before triggering the workflow. Default is `"all_my_ml_models"`.
-- **`inference_table`** (optional): The name of the table where inferences will be stored. Default is under the format `catalog.schema.table_name`.
-- **`include_feature_store`** (optional): Whether to include a Databricks Feature Store in the project. Options: `"yes"` or `"no"`. Default is `"no"`.
+- **`inference_table`** (optional): The name of the table where inferences will be stored. Default is under the 3-level format `catalog.schema.table_name`.
+- **`include_feature_store`** (optional): Whether to include a Databricks Feature Store in the project. Options: `yes` or `no`. Default is `no`.
 
 ### Secrets
 
 The workflow requires the following GitHub Secrets:
 
 - **`ADMIN_GITHUB_TOKEN`**: A GitHub token with admin access to the repositories, required for creating new repositories and setting secrets.
-- **`DATABRICKS_STAGING_CLIENT_SECRET`**: The secret for authenticating with the Databricks staging workspace.
-- **`DATABRICKS_PROD_CLIENT_SECRET`**: The secret for authenticating with the Databricks production workspace.
+- **`DATABRICKS_STAGING_CLIENT_SECRET`**: The client secret for authenticating with the staging databricks workspace.
+- **`DATABRICKS_PROD_CLIENT_SECRET`**: The client secret for authenticating with the production databricks workspace.
+- **`DATABRICKS_TOKEN`**: Used to initialize the databricks mlops bundle, can be any authentication token for any workspace.
 
 ### Environment Variables
 
 The following environment variables must be set at the organization or repository level (`Organization Settings > Secrets and Variables > Variables`):
 
-- **`DATABRICKS_STAGING_WORKSPACE_HOST`**: The Databricks workspace host URL for the staging environment.
-- **`DATABRICKS_PROD_WORKSPACE_HOST`**: The Databricks workspace host URL for the production environment.
-- **`DATABRICKS_STAGING_CLIENT_ID`**: The client ID for authenticating with the Databricks staging environment.
-- **`DATABRICKS_PROD_CLIENT_ID`**: The client ID for authenticating with the Databricks production environment.
-- **`DATABRICKS_CLOUD`**: The cloud provider hosting Databricks (e.g., `"azure"`).
-- **`DATABRICKS_CICD_PLATFORM`**: The platform used for CI/CD (e.g., `"github"`).
-- **`DATABRICKS_READ_USER_GROUP`**: The user group that should have read access to the project.
-- **`DATABRICKS_UNITY_CATALOG_READ_USER_GROUP`**: The Unity Catalog read user group.
-- **`DATABRICKS_STAGING_CATALOG_NAME`**: The catalog name for the staging environment.
+- **`DATABRICKS_CICD_PLATFORM`**: The platform used for CI/CD (e.g., `github_actions`).
+- **`DATABRICKS_CLOUD`**: The cloud provider hosting Databricks (e.g., `azure`).
 - **`DATABRICKS_PROD_CATALOG_NAME`**: The catalog name for the production environment.
-- **`DATABRICKS_TEST_CATALOG_NAME`**: The catalog name for the testing environment.
-- **`USE_DATABRICKS_SERVICE_PRINCIPAL`**: Feature flag. If provided, use Databricks service principals instead of (default) cloud provider service principals.
+- **`DATABRICKS_PROD_CLIENT_ID`**: The client ID for authenticating with the Databricks production environment.
+- **`DATABRICKS_PROD_TENANT_ID`**: The tenant ID for authenticating with the Databricks production environment.
+- **`DATABRICKS_PROD_WORKSPACE_HOST`**: The Databricks workspace host URL for the production environment.
+- **`DATABRICKS_READ_USER_GROUP`**: The user group inside databricks that should have read access to the databricks workflows for the ml project.
+- **`DATABRICKS_STAGING_CATALOG_NAME`**: The catalog name for the staging environment.
+- **`DATABRICKS_STAGING_CLIENT_ID`**: The client ID for authenticating with the Databricks staging environment.
+- **`DATABRICKS_STAGING_TENANT_ID`**: The tenant ID for authenticating with the Databricks staging environment.
+- **`DATABRICKS_STAGING_WORKSPACE_HOST`**: The Databricks workspace host URL for the staging environment.
+
+- **`DATABRICKS_UNITY_CATALOG_READ_USER_GROUP`**: The Unity Catalog read user group.
+
+
+- **`USE_DATABRICKS_SERVICE_PRINCIPAL`**: Feature flag. If different from `''` (empty string), use Databricks service principals instead of cloud provider service principals.
 
 ## Workflow Steps
 
