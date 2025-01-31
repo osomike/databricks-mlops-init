@@ -120,6 +120,8 @@ jobs:
         run: |
           echo "Copying data discovery notebook into the templated solution folder..."
           ls -a
+          ls ./${{ inputs.project_name }}/ -a
+          ls ./${{ inputs.project_name }}/${{ inputs.project_name }}/ -a
           cp -r custom_notebooks/discovery ./${{ inputs.project_name }}/${{ inputs.project_name }}/discovery
           echo "Commiting all the templated solution folder into the repository ${{ github.repository_owner }}/${{ inputs.project_name }}..."
           cd ${{ inputs.project_name }}
