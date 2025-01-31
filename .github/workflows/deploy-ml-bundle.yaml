@@ -115,10 +115,11 @@ jobs:
           # also check this https://github.com/databricks/mlops-stacks
           # and also this https://gist.github.com/DaniJG/b21170482545ad8c93874d164fd97a90 and this
           # https://github.com/databricks/mlops-stacks/blob/main/tests/example-project-configs/azure/azure-github.json
-
+          ls -a
       - name: Initialize local repository
         run: |
           echo "Copying data discovery notebook into the templated solution folder..."
+          ls -a
           cp -r custom_notebooks/discovery ./${{ inputs.project_name }}/${{ inputs.project_name }}/discovery
           echo "Commiting all the templated solution folder into the repository ${{ github.repository_owner }}/${{ inputs.project_name }}..."
           cd ${{ inputs.project_name }}
