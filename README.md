@@ -18,7 +18,7 @@ The workflow can be triggered manually via the `workflow_dispatch` event. When t
 
 ### Inputs
 
-- **`project_name`** (required): The name of the new ML use case. This name will also be used to create the GitHub repository.
+- **`project_name`** (required): The name of the new ML use case. This name will also be used to create the GitHub repository. Do not use dashes `-` on the name. 
 - **`github_contributor_group`** (required): The name of the GitHub team group with contributor rights. This group will be granted access to contribute to the newly created repository.
 - **`github_admins_group`** (required): The name of the GitHub team group with administrator rights. This group will be granted access to administrate the newly created repository.
 - **`model_schema`** (optional): The schema where models will be stored. This schema has to be present in staging and production before triggering the workflow. Default is `"all_my_ml_models"`.

@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       project_name:
-        description: ML use case name
+        description: ML use case name. Do not use dashes `-` on the name.
         type: string
         required: true
       github_contributor_group:
