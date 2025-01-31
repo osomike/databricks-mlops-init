@@ -22,16 +22,19 @@ on:
       model_schema:
         description: Schema where models will be stored
         type: string
-        required: true
         default: "all_my_ml_models"
+      inference_table:
+        description: Table where the inferences will be stored under `catalog.schema.table_name` format 
+        type: string
+        default: "test_dev_catalog.dip_ml_usecase_01.predictions_usecase_01"
       include_feature_store:
-        description: Whether to include Feature Store
         type: choice
+        description: Whether to include Feature Store
         options:
           - "no"
           - "yes"
-        required: true
         default: "no"
+        required: true
 env:
   PYTHON_VERSION: '3.10'
 
@@ -53,7 +56,7 @@ jobs:
           gh api -X PUT /orgs/${{ github.repository_owner }}/teams/${{ inputs.github_admins_group }}/repos/${{ github.repository_owner }}/${{ inputs.project_name }} -f permission=admin
           gh api -X PUT /orgs/${{ github.repository_owner }}/teams/${{ inputs.github_contributor_group }}/repos/${{ github.repository_owner }}/${{ inputs.project_name }} -f permission=push
           echo "Setting secrets on repository ${{ github.repository_owner }}/${{ inputs.project_name }}..."
-          if [ "${{ vars.USE_DATABRICKS_SERVICE_PRINCIPAL }}" == "true" ]; then
+          if [ "${{ vars.USE_DATABRICKS_SERVICE_PRINCIPAL }}" != "" ]; then
             gh secret set STAGING_DATABRICKS_HOST -b "${{ vars.DATABRICKS_STAGING_WORKSPACE_HOST }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
             gh secret set STAGING_DATABRICKS_CLIENT_ID -b "${{ vars.DATABRICKS_STAGING_CLIENT_ID }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
             gh secret set STAGING_DATABRICKS_CLIENT_SECRET -b "${{ secrets.DATABRICKS_STAGING_CLIENT_SECRET }}" -R ${{ github.repository_owner }}/${{ inputs.project_name }}
@@ -103,7 +106,7 @@ jobs:
             "input_test_catalog_name": "${{ vars.DATABRICKS_TEST_CATALOG_NAME }}",
             "input_schema_name": "${{ inputs.model_schema }}",
             "input_unity_catalog_read_user_group": "${{ vars.DATABRICKS_UNITY_CATALOG_READ_USER_GROUP }}",
-            "input_inference_table_name": "${{ vars.DATABRICKS_TEST_CATALOG_NAME }}.${{ inputs.model_schema }}.predictions",
+            "input_inference_table_name": "${{ inputs.inference_table }}",
             "input_include_feature_store": "${{ inputs.include_feature_store }}"
           }' > config.json
           databricks bundle init mlops-stacks --tag v0.4 --config-file config.json
@@ -144,7 +147,7 @@ jobs:
           git commit -a -m "Run clusters in single-user mode"
 
       - name: Modify service principal source
-        if: ${{ vars.USE_DATABRICKS_SERVICE_PRINCIPAL == 'true' }}
+        if: ${{ vars.USE_DATABRICKS_SERVICE_PRINCIPAL != '' }}
         run: |
           cd ${{ inputs.project_name }}
           # See https://docs.databricks.com/en/dev-tools/auth/oauth-m2m.html#finish-configuring-oauth-m2m-authentication

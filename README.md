@@ -22,6 +22,7 @@ The workflow can be triggered manually via the `workflow_dispatch` event. When t
 - **`github_contributor_group`** (required): The name of the GitHub team group with contributor rights. This group will be granted access to contribute to the newly created repository.
 - **`github_admins_group`** (required): The name of the GitHub team group with administrator rights. This group will be granted access to administrate the newly created repository.
 - **`model_schema`** (optional): The schema where models will be stored. This schema has to be present in staging and production before triggering the workflow. Default is `"all_my_ml_models"`.
+- **`inference_table`** (optional): The name of the table where inferences will be stored. Default is under the format `catalog.schema.table_name`.
 - **`include_feature_store`** (optional): Whether to include a Databricks Feature Store in the project. Options: `yes` or `no` (default). If `no`, the `feature_engineering` folder and job are excluded, and preprocessing must be implemented manually in the training and inference jobs.
 
 ### Secrets
