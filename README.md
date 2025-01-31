@@ -26,16 +26,16 @@ The workflow can be triggered manually via the `workflow_dispatch` event. When t
 
 ### Secrets
 
-The workflow requires the following GitHub Secrets:
+The workflow requires the following GitHub Secrets, in an environment named `default`:
 
-- **`ADMIN_GITHUB_TOKEN`**: A GitHub token with admin access to the repositories, required for creating new repositories and setting secrets.
+- **`ADMIN_GITHUB_TOKEN`**: A GitHub token with admin access to the repositories, required for creating new repositories and setting secrets. For more details [check this section](#6-github-token-with-adequate-permissions)
 - **`DATABRICKS_STAGING_CLIENT_SECRET`**: The service principal client secret for authenticating with the staging databricks workspace.
 - **`DATABRICKS_PROD_CLIENT_SECRET`**: The service principal client secret for authenticating with the production databricks workspace.
 - **`DATABRICKS_TOKEN`**: Used to initialize the databricks mlops bundle, can be any authentication token for any workspace.
 
 ### Environment Variables
 
-The following environment variables must be set at the organization or repository level (`Organization Settings > Secrets and Variables > Variables`):
+The following environment variables must be set at the organization (`Organization Settings > Secrets and Variables > Variables`) or repository level, in an environment named `default`:
 
 - **`DATABRICKS_CICD_PLATFORM`**: The platform used for CI/CD (e.g., `github_actions`).
 - **`DATABRICKS_CLOUD`**: The cloud provider hosting Databricks (e.g., `azure`).
@@ -43,13 +43,13 @@ The following environment variables must be set at the organization or repositor
 - **`DATABRICKS_PROD_CLIENT_ID`**: The service principal client ID for authenticating with the Databricks production environment.
 - **`DATABRICKS_PROD_TENANT_ID`**: The tenant ID where the service principal is registered, for authenticating with the Databricks production environment. Only needed if Azure service principals are used. Check variable `USE_DATABRICKS_SERVICE_PRINCIPAL`
 - **`DATABRICKS_PROD_WORKSPACE_HOST`**: The Databricks workspace host URL for the production environment. (e.g., `https://adb-xxx.azuredatabricks.net`)
-- **`DATABRICKS_READ_USER_GROUP`**: The user group inside databricks that should have read access to the databricks workflows for the ml project.
 - **`DATABRICKS_STAGING_CATALOG_NAME`**: The catalog name for the staging environment. Note.- Keep in mind that this name will also be used in the bundle as the staging target name, and associate it to the staging workspace and the staging service principal. Once the repository is initalized check the file `/<project_name>/databricks.yml`
 - **`DATABRICKS_STAGING_CLIENT_ID`**: The service principal client ID for authenticating with the Databricks staging environment.
 - **`DATABRICKS_STAGING_TENANT_ID`**: The tenant ID where the service principal is registered, for authenticating with the Databricks staging environment. Only needed if Azure service principals are used. Check variable `USE_DATABRICKS_SERVICE_PRINCIPAL`
 - **`DATABRICKS_STAGING_WORKSPACE_HOST`**: The Databricks workspace host URL for the staging environment. (e.g., `https://adb-xxx.azuredatabricks.net`)
 - **`DATABRICKS_TEST_CATALOG_NAME`**: The catalog name for the test environment. Note.- Keep in mind that this name will also be used in the bundle as the test target name, and associate it to the staging workspace and the staging service principal. Once the repository is initalized check the file `/<project_name>/databricks.yml`
 - **`DATABRICKS_UNITY_CATALOG_READ_USER_GROUP`**: The Unity Catalog read user group.
+- **`DATABRICKS_READ_USER_GROUP`**: The user group inside databricks that should have read access to the databricks workflows for the ml project.
 - **`USE_DATABRICKS_SERVICE_PRINCIPAL`**: Feature flag. If `true`, use Databricks service principals instead of cloud provider service principals.
 
 ## Workflow Steps
@@ -121,13 +121,14 @@ Before deploying this workflow in your organization, ensure that the following r
 ### 6. GitHub Token with Adequate Permissions
    - A **GitHub Personal Access Token (PAT)** with the necessary permissions on the organization github space is required to automate the repository creation and configure access and secrets/variables:
      - Repository permissions needed:
-       - **Administration**: To create new private repositories for each ML use case and assign collaborators with
+       - **Administration**: `Read and write` to create new private repositories for each ML use case and assign collaborators with
        admin, write, or read permissions to the newly created repository.
-       - **Commit statuses**: To add commits to the new repositories.
-       - **Contents**: To access repository contents, commits, branches, downloads, releases, and merges.
-       - **Environments**: To manage repository environments.
-       - **Secrets**: To configure environment variables and secrets in the repository for secure authentication (e.g., Databricks workspace credentials).
-       - **Workflows**: To update GitHub Action workflow files from the newly created repositories.
+       - **Commit statuses**: `Read and write` to add commits to the new repositories.
+       - **Contents**: `Read and write` to access repository contents, commits, branches, downloads, releases, and merges.
+       - **Environments**: `Read and write` to manage repository environments.
+       - **Metadata**: `Read-only` to read metadata.
+       - **Secrets**: `Read and write` to configure environment variables and secrets in the repository for secure authentication (e.g., Databricks workspace credentials).
+       - **Workflows**: `Read and write` to update GitHub Action workflow files from the newly created repositories.
 
      - Organization permissions needed:
        - **Members**: `Read-Only` to be able to read the groups defined inside the organizations. To then be able to grant access to the newly created use-case repository to these groups.
