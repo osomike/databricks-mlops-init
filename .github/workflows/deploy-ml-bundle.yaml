@@ -109,6 +109,8 @@ jobs:
             "input_inference_table_name": "${{ inputs.inference_table }}",
             "input_include_feature_store": "${{ inputs.include_feature_store }}"
           }' > config.json
+          echo "The following configuration will used by the bundle:"
+          cat config.json
           databricks bundle init mlops-stacks --tag v0.4 --config-file config.json
           # bundle version (tag) is pinned based on https://github.com/databricks/mlops-stacks/tags
           # read this https://docs.databricks.com/en/dev-tools/bundles/settings.html#bundle-syntax-mappings
@@ -129,7 +131,7 @@ jobs:
           git config user.email "noreply@digital-power.com"
           git config user.name "${{ github.actor }}"
           git add .
-          git commit -m "Initialize the repository"
+          git commit -m "Automatic commit - Initialize the repository"
 
       - name: Run clusters in single-user mode
         run: |
@@ -147,7 +149,7 @@ jobs:
           sed -i "
             s/\( *\)\(new_cluster:\)\$/\1\2\n\1  data_security_mode: SINGLE_USER\n\1  single_user_name: \${var.sp_client_id}/
           " ${{ inputs.project_name }}/resources/*.yml
-          git commit -a -m "Run clusters in single-user mode"
+          git commit -a -m "Automatic commit - Run clusters in single-user mode"
 
       - name: Modify service principal source
         if: ${{ vars.USE_DATABRICKS_SERVICE_PRINCIPAL != '' }}
@@ -164,7 +166,7 @@ jobs:
           else
             exit 1
           fi
-          git commit -a -m "Modify service principal source"
+          git commit -a -m "Automatic commit - Modify service principal source"
 
       - name: Push to remote
         env:
