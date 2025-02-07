@@ -80,7 +80,7 @@ jobs:
     needs: create-repo
     steps:
       - name: Setup Databricks CLI
-        uses: databricks/setup-cli@main
+        uses: databricks/setup-cli@v0.240.0
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -117,11 +117,9 @@ jobs:
           # also check this https://github.com/databricks/mlops-stacks
           # and also this https://gist.github.com/DaniJG/b21170482545ad8c93874d164fd97a90 and this
           # https://github.com/databricks/mlops-stacks/blob/main/tests/example-project-configs/azure/azure-github.json
-          ls -a
       - name: Initialize local repository
         run: |
           echo "Copying data discovery notebook into the templated solution folder..."
-          ls -a
           ls ./${{ inputs.project_name }}/ -a
           ls ./${{ inputs.project_name }}/${{ inputs.project_name }}/ -a
           cp -r custom_notebooks/discovery ./${{ inputs.project_name }}/${{ inputs.project_name }}/discovery
@@ -140,12 +138,22 @@ jobs:
           # https://docs.databricks.com/en/compute/access-mode-limitations.html#shared-access-mode-limitations-on-unity-catalog
           # https://docs.databricks.com/en/dev-tools/bundles/variables.html#custom-variables
           # https://docs.databricks.com/api/azure/workspace/jobs/create#job_clusters-new_cluster-data_security_mode
+          # sed -i "
+          #   s/\(variables:.*\)/\1\n  sp_client_id:\n    description: Client ID (or Application ID) of the service principal./
+          #   s/\( *\)\(${{ vars.DATABRICKS_STAGING_CATALOG_NAME }}:.*\)/\1\2\n\1  variables:\n\1    sp_client_id: ${{ vars.DATABRICKS_STAGING_CLIENT_ID }}/
+          #   s/\( *\)\(${{ vars.DATABRICKS_PROD_CATALOG_NAME }}:.*\)/\1\2\n\1  variables:\n\1    sp_client_id: ${{ vars.DATABRICKS_PROD_CLIENT_ID }}/
+          #   s/\( *\)\(${{ vars.DATABRICKS_TEST_CATALOG_NAME }}:.*\)/\1\2\n\1  variables:\n\1    sp_client_id: ${{ vars.DATABRICKS_STAGING_CLIENT_ID }}/
+          # " ${{ inputs.project_name }}/databricks.yml
           sed -i "
-            s/\(variables:.*\)/\1\n  sp_client_id:\n    description: Client ID (or Application ID) of the service principal./
-            s/\( *\)\(${{ vars.DATABRICKS_STAGING_CATALOG_NAME }}:.*\)/\1\2\n\1  variables:\n\1    sp_client_id: ${{ vars.DATABRICKS_STAGING_CLIENT_ID }}/
-            s/\( *\)\(${{ vars.DATABRICKS_PROD_CATALOG_NAME }}:.*\)/\1\2\n\1  variables:\n\1    sp_client_id: ${{ vars.DATABRICKS_PROD_CLIENT_ID }}/
-            s/\( *\)\(${{ vars.DATABRICKS_TEST_CATALOG_NAME }}:.*\)/\1\2\n\1  variables:\n\1    sp_client_id: ${{ vars.DATABRICKS_STAGING_CLIENT_ID }}/
+            s/^variables:/variables:\n  sp_client_id:\n    description: Client ID (or Application ID) of the service principal./
           " ${{ inputs.project_name }}/databricks.yml
+          git commit -a -m "Automatic commit - Add variable description for sp_client_id"
+          sed -i "
+            s/\( *\)\(catalog_name: ${{ vars.DATABRICKS_TEST_CATALOG_NAME    }}\)/\1\2\n\1sp_client_id: ${{ vars.DATABRICKS_STAGING_CLIENT_ID }}/
+            s/\( *\)\(catalog_name: ${{ vars.DATABRICKS_STAGING_CATALOG_NAME }}\)/\1\2\n\1sp_client_id: ${{ vars.DATABRICKS_STAGING_CLIENT_ID }}/
+            s/\( *\)\(catalog_name: ${{ vars.DATABRICKS_PROD_CATALOG_NAME    }}\)/\1\2\n\1sp_client_id: ${{ vars.DATABRICKS_PROD_CLIENT_ID }}/
+          " ${{ inputs.project_name }}/databricks.yml
+          git commit -a -m "Automatic commit - Add service principals for test, staging and prod environments"
           sed -i "
             s/\( *\)\(new_cluster:\)\$/\1\2\n\1  data_security_mode: SINGLE_USER\n\1  single_user_name: \${var.sp_client_id}/
           " ${{ inputs.project_name }}/resources/*.yml
