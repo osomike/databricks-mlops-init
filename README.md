@@ -53,6 +53,8 @@ The following environment variables must be set at the organization (`Organizati
 - **`DATABRICKS_READ_USER_GROUP`**: The user group inside databricks that should have read access to the databricks workflows for the ml project.
 - **`USE_DATABRICKS_SERVICE_PRINCIPAL`**: Feature flag. If `true`, use Databricks service principals instead of cloud provider service principals.
 
+Note.- The catalog names for test, staging and production should be different.
+
 ## Workflow Steps
 
 ### 1. Repository Creation
