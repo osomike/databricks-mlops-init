@@ -1,2 +1,5 @@
 # Private credentials stored locally
 /credentials/*
+
+# Private credentials stored locally
+/test*
