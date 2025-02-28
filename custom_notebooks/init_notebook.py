@@ -19,9 +19,9 @@
 # MAGIC - **Staging Catalog:** `staging_catalog`
 # MAGIC - **Development Catalog:** `dev_catalog`
 # MAGIC
-# MAGIC It also creates the **schema** `schema_name` and the **inference input example table** `table_name` in each environment.
+# MAGIC It also creates the **schema** `schema_name` and the **inference input example table** `table_name` in each environment. Which need to be created before deploying the new use case.
 # MAGIC
-# MAGIC 📌 **Note:** The table name should match the value assigned to `table_name` in this notebook.  
+# MAGIC 📌 **Note:** The table name should match the value assigned to `table_name` in this notebook and the yml file `<ml-use-case-name>/resources/batch-inference-workflow-resource.yml`
 # MAGIC For example:  `${var.catalog_name}.<ml-use-case-schema-name>.inference_input_example`
 # MAGIC
 # MAGIC
