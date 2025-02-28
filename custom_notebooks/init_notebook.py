@@ -38,7 +38,7 @@
 # MAGIC ---
 # MAGIC
 # MAGIC ## 4. Databricks Permissions
-# MAGIC - Grant **editor permissions** to the appropriate **service principals**:
+# MAGIC - Grant **editor permissions** to the appropriate **service principals**, this can be done via the Catalog UI in permissions tab.:
 # MAGIC   
 # MAGIC   **Staging Permissions:**
 # MAGIC   - `DATABRICKS_STAGING_CLIENT_SECRET` → `DATABRICKS_TEST_CATALOG_NAME` and `DATABRICKS_STAGING_CATALOG_NAME`
