@@ -20,20 +20,21 @@ on:
         required: true
         default: "dip_ml_admins"
       model_schema:
-        description: Schema where models will be stored
+        description: Schema name, where the models and tables for this use case will be stored.
         type: string
+        required: true
         default: "all_my_ml_models"
-      inference_table:
-        description: Table where the inferences will be stored under `catalog.schema.table_name` format 
-        type: string
-        default: "test_dev_catalog.dip_ml_usecase_01.predictions_usecase_01"
+    #   inference_table:
+    #     description: Table where the inferences will be stored under `catalog.schema.table_name` format 
+    #     type: string
+    #     default: "This is not used in the bundle, use a random text and delete this parameter. test_dev_catalog.dip_ml_usecase_01.predictions_usecase_01"
       include_feature_store:
         type: choice
         description: Whether to include Feature Store
         options:
           - "no"
           - "yes"
-        default: "no"
+        default: "yes"
         required: true
 env:
   PYTHON_VERSION: '3.10'
@@ -106,7 +107,7 @@ jobs:
             "input_test_catalog_name": "${{ vars.DATABRICKS_TEST_CATALOG_NAME }}",
             "input_schema_name": "${{ inputs.model_schema }}",
             "input_unity_catalog_read_user_group": "${{ vars.DATABRICKS_UNITY_CATALOG_READ_USER_GROUP }}",
-            "input_inference_table_name": "${{ inputs.inference_table }}",
+            "input_inference_table_name": "THIS.PARAMETER.IS_NOT_USED",
             "input_include_feature_store": "${{ inputs.include_feature_store }}"
           }' > config.json
           echo "The following configuration will used by the bundle:"
@@ -119,10 +120,10 @@ jobs:
           # https://github.com/databricks/mlops-stacks/blob/main/tests/example-project-configs/azure/azure-github.json
       - name: Initialize local repository
         run: |
-          echo "Copying data discovery notebook into the templated solution folder..."
+          echo "Copying data data exploration notebook into the templated solution folder..."
           ls ./${{ inputs.project_name }}/ -a
           ls ./${{ inputs.project_name }}/${{ inputs.project_name }}/ -a
-          cp -r custom_notebooks/discovery ./${{ inputs.project_name }}/${{ inputs.project_name }}/discovery
+          cp -r custom_notebooks/data_exploration ./${{ inputs.project_name }}/${{ inputs.project_name }}/data_exploration
           echo "Commiting all the templated solution folder into the repository ${{ github.repository_owner }}/${{ inputs.project_name }}..."
           cd ${{ inputs.project_name }}
           git init -b main
@@ -138,12 +139,6 @@ jobs:
           # https://docs.databricks.com/en/compute/access-mode-limitations.html#shared-access-mode-limitations-on-unity-catalog
           # https://docs.databricks.com/en/dev-tools/bundles/variables.html#custom-variables
           # https://docs.databricks.com/api/azure/workspace/jobs/create#job_clusters-new_cluster-data_security_mode
-          # sed -i "
-          #   s/\(variables:.*\)/\1\n  sp_client_id:\n    description: Client ID (or Application ID) of the service principal./
-          #   s/\( *\)\(${{ vars.DATABRICKS_STAGING_CATALOG_NAME }}:.*\)/\1\2\n\1  variables:\n\1    sp_client_id: ${{ vars.DATABRICKS_STAGING_CLIENT_ID }}/
-          #   s/\( *\)\(${{ vars.DATABRICKS_PROD_CATALOG_NAME }}:.*\)/\1\2\n\1  variables:\n\1    sp_client_id: ${{ vars.DATABRICKS_PROD_CLIENT_ID }}/
-          #   s/\( *\)\(${{ vars.DATABRICKS_TEST_CATALOG_NAME }}:.*\)/\1\2\n\1  variables:\n\1    sp_client_id: ${{ vars.DATABRICKS_STAGING_CLIENT_ID }}/
-          # " ${{ inputs.project_name }}/databricks.yml
           sed -i "
             s/^variables:/variables:\n  sp_client_id:\n    description: Client ID (or Application ID) of the service principal./
           " ${{ inputs.project_name }}/databricks.yml
