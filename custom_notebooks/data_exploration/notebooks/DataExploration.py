@@ -3,14 +3,9 @@
 import sys
 
 import plotly.express as px
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 from ydata_profiling import ProfileReport
 from databricks.connect import DatabricksSession
-
-%matplotlib inline
 
 sys.path.append("../helpers")
 from readers import read_from_volume
@@ -35,7 +30,7 @@ profile.to_notebook_iframe()
 
 # COMMAND ----------
 
-fig = px.scatter_matrix(df.drop(labels=['tpep_pickup_datetime', 'tpep_dropoff_datetime'], axis=1))
+fig = px.scatter_matrix(df.drop(labels=["tpep_pickup_datetime", "tpep_dropoff_datetime"], axis=1))
 fig.update_traces(diagonal_visible=False)
 fig.update_layout(
     width=1500,
